@@ -24,7 +24,6 @@
 #include "rng.h"
 #include "spi.h"
 #include "usart.h"
-#include "usb_otg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -61,9 +60,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static void vector_setup(void) {
-	SCB->VTOR = BOOTLOADER_SIZE;
-}
 
 /* USER CODE END 0 */
 
@@ -75,7 +71,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	vector_setup();
 
   /* USER CODE END 1 */
 
@@ -92,7 +87,10 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  if( __get_PRIMASK() == 1)
+    {
+  	  __enable_irq();
+    }
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -100,11 +98,11 @@ int main(void)
   MX_I2C1_Init();
   MX_I2S3_Init();
   MX_SPI1_Init();
-  MX_USB_OTG_FS_HCD_Init();
   MX_CRC_Init();
   MX_RNG_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
   printf("Running Application Mainloop\r\n");
 
   /* USER CODE END 2 */

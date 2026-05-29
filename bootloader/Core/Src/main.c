@@ -21,16 +21,16 @@
 #include "crc.h"
 #include "i2c.h"
 #include "i2s.h"
+#include "mbedtls.h"
 #include "rng.h"
 #include "spi.h"
 #include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,7 +40,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BL_VERSION "v0.0.1"
+#define BL_VERSION "v0.0.2"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,9 +64,32 @@ typedef void (*fnPtr_t)(void);
 #define APPLICATION_RESET_VECTOR (APPLICATION_START | 0x04U)
 void jump_to_application(void)
 {
-	uint32_t sp_val = *(uint32_t*)APPLICATION_START;
-	__set_MSP(sp_val);
-	fnPtr_t app = (fnPtr_t)(*(uint32_t *)(APPLICATION_RESET_VECTOR));
+	uint32_t app_stack = *(uint32_t*)APPLICATION_START;
+	uint32_t app_reset = *(volatile uint32_t*)(APPLICATION_START + 4);
+	fnPtr_t app = (fnPtr_t)(app_reset);
+	printf("SP = 0x%08lx\r\n", app_stack);
+	printf("RESET = 0x%08lx\r\n", app_reset);
+	__disable_irq();
+	/* Stop SysTick */
+	SysTick->CTRL = 0;
+	SysTick->LOAD = 0;
+	SysTick->VAL  = 0;
+
+	HAL_RCC_DeInit();
+	HAL_DeInit();
+
+	/* Relocate vector table */
+	SCB->VTOR = APPLICATION_START;
+
+	__DSB();
+	__ISB();
+
+	/* Set MSP */
+	__set_MSP(app_stack);
+
+	__DSB();
+	__ISB();
+
 	app();
 }
 /* USER CODE END PFP */
@@ -104,14 +127,15 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-//  MX_GPIO_Init();
-//  MX_I2C1_Init();
-//  MX_I2S3_Init();
-//  MX_SPI1_Init();
-//  MX_USB_OTG_FS_HCD_Init();
-//  MX_CRC_Init();
-//  MX_RNG_Init();
+  MX_GPIO_Init();
+  MX_I2C1_Init();
+  MX_I2S3_Init();
+  MX_SPI1_Init();
+  MX_USB_OTG_FS_HCD_Init();
+  MX_CRC_Init();
+  MX_RNG_Init();
   MX_USART2_UART_Init();
+  MX_MBEDTLS_Init();
   /* USER CODE BEGIN 2 */
 
   printf("Custom Bootloader %s\r\n",BL_VERSION);
