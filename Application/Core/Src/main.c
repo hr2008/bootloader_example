@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "app_data.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BOOTLOADER_SIZE 0x8000U
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,7 +61,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+__attribute__((section(".HEADER_DATA"), used))
+const image_header_t image_header =
+{
+	.fwVersion  = 123,
+    .imageMagic = 0xDEADFEED,
+};
 
+void setup_vtor()
+{
+	extern uint32_t __isr_vector_start__;
+	SCB->VTOR = (uint32_t)&__isr_vector_start__;
+}
+
+_Static_assert(sizeof(image_header_t) <= 256,
+               "image_header_t too large");
 /* USER CODE END 0 */
 
 /**
@@ -103,7 +118,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  printf("Running Application Mainloop\r\n");
+  printf("Running Application Mainloop \r\n");
 
   /* USER CODE END 2 */
 

@@ -33,7 +33,7 @@
     <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.launch.verify_flash_download" value="true"/>
     <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.cti_allow_halt" value="false"/>
     <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.cti_signal_halt" value="false"/>
-    <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.enable_logging" value="false"/>
+    <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.enable_logging" value="true"/>
     <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.enable_max_halt_delay" value="false"/>
     <booleanAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.enable_shared_stlink" value="false"/>
     <stringAttribute key="com.st.stm32cube.ide.mcu.debug.stlink.frequency" value="0"/>
@@ -84,7 +84,7 @@
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="4"/>
     </listAttribute>
-    <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;/&gt;"/>
+    <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;&gt;&lt;gdbmemoryBlockExpression address=&quot;537001944&quot; label=&quot;&amp;amp;(hash[0])&quot;/&gt;&lt;gdbmemoryBlockExpression address=&quot;537001944&quot; label=&quot;hash&quot;/&gt;&lt;gdbmemoryBlockExpression address=&quot;537001944&quot; label=&quot;hash&quot;/&gt;&lt;/memoryBlockExpressionList&gt;"/>
     <stringAttribute key="process_factory_id" value="com.st.stm32cube.ide.mcu.debug.launch.HardwareDebugProcessFactory"/>
-    <stringAttribute key="saved_expressions&lt;seperator&gt;Unknown" value="0x8008004"/>
+    <stringAttribute key="saved_expressions&lt;seperator&gt;Unknown" value="0x8008004,0x0800C000,0x800c000,0x0800c100"/>
 </launchConfiguration>

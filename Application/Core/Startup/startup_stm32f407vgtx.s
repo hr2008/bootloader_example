@@ -63,6 +63,8 @@ Reset_Handler:
 /* Call the clock system initialization function.*/
   bl  SystemInit  
 
+  /*bl setup_vtor */
+
 /* Copy the data segment initializers from flash to SRAM */  
   ldr r0, =_sdata
   ldr r1, =_edata

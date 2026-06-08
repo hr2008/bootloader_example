@@ -1,0 +1,2 @@
+../Core/Src/validate_image.c:6:5:compute_hash	136	static
+../Core/Src/validate_image.c:27:5:verify_app_header	16	static

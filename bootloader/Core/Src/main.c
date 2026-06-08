@@ -31,6 +31,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "app_data.h"
+#include "validate_image.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,7 +42,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BL_VERSION "v0.0.2"
+#define BL_VERSION "v0.0.3"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,7 +53,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+static image_header_t *image_header;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,16 +61,16 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
 typedef void (*fnPtr_t)(void);
+extern uint32_t _app_start;
 
-#define APPLICATION_START	0x8008000U
-#define APPLICATION_RESET_VECTOR (APPLICATION_START | 0x04U)
+
 void jump_to_application(void)
 {
-	uint32_t app_stack = *(uint32_t*)APPLICATION_START;
-	uint32_t app_reset = *(volatile uint32_t*)(APPLICATION_START + 4);
-	fnPtr_t app = (fnPtr_t)(app_reset);
-	printf("SP = 0x%08lx\r\n", app_stack);
-	printf("RESET = 0x%08lx\r\n", app_reset);
+	uint32_t vtor = (uint32_t)&(_app_start);
+	fnPtr_t app = (fnPtr_t)(*(uint32_t*)(vtor  + 4));
+	printf("SP = 0x%08lx\r\n", _app_start);
+	printf("RESET = 0x%08lx\r\n", (uint32_t)app);
+	printf("App version - %ld \r\n", image_header->fwVersion);
 	__disable_irq();
 	/* Stop SysTick */
 	SysTick->CTRL = 0;
@@ -79,13 +81,13 @@ void jump_to_application(void)
 	HAL_DeInit();
 
 	/* Relocate vector table */
-	SCB->VTOR = APPLICATION_START;
+	SCB->VTOR = vtor;
 
 	__DSB();
 	__ISB();
 
 	/* Set MSP */
-	__set_MSP(app_stack);
+	__set_MSP(_app_start);
 
 	__DSB();
 	__ISB();
@@ -107,7 +109,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  uint8_t hash[32];
+  uint32_t val = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -139,8 +142,31 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   printf("Custom Bootloader %s\r\n",BL_VERSION);
-  printf("Entering application\r\n");
-  jump_to_application();
+  compute_hash(hash);
+  image_header = (image_header_t*)IMAGE_HEADER;
+
+  if(image_header->imageMagic != 0xDEADFEED)
+  {
+	  printf("Error - Invalid image magic");
+	  while(1);
+  }
+  printf("computed Hash - ");
+  for(int i =0; i < 32; i++)
+  {
+	  printf("%x",hash[i]);
+	  val |= (hash[i] ^ image_header->imageHash[i]);
+  }
+  printf("\r\n");
+  if(val == 0)
+  {
+	  printf("Image Verified - Entering application\r\n");
+	  jump_to_application();
+  }
+  else
+  {
+	  printf("Invalid Image");
+	  while(1);
+  }
 
 
   /* USER CODE END 2 */

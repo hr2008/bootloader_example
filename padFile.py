@@ -3,7 +3,8 @@
 import sys
 from pathlib import Path
 
-BOOTLOADER_SIZE = 0x8000
+ONE_K = 1024
+BOOTLOADER_SIZE = 48 * ONE_K
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} <bootloader_bin>")

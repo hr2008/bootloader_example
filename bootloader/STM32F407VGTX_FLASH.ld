@@ -42,12 +42,16 @@ _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 _Min_Heap_Size = 0x200; /* required amount of heap */
 _Min_Stack_Size = 0x400; /* required amount of stack */
 
+_app_start = ORIGIN(APP_FLASH);
+_image_header = ORIGIN(IMAGE_HEADER);
 /* Memories definition */
 MEMORY
 {
   CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 32K
+  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 48K
+  IMAGE_HEADER      (rx)  : ORIGIN = 0x0800C000, LENGTH = 256
+  APP_FLASH      (rx)  : ORIGIN = 0x0800C100, LENGTH = 975K
 }
 
 /* Sections */

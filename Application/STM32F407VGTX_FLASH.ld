@@ -45,28 +45,39 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Memories definition */
 MEMORY
 {
-  CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
-  RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
-  BL_FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 32K
-  FLASH    (rx)    : ORIGIN = 0x8008000,   LENGTH = 992K
+  CCMRAM     (xrw) : ORIGIN = 0x10000000, LENGTH = 64K
+  RAM        (xrw) : ORIGIN = 0x20000000, LENGTH = 128K
+  BL_FLASH   (rx)  : ORIGIN = 0x08000000, LENGTH = 48K
+  IMAGE_HEADER      (rx)  : ORIGIN = 0x0800C000, LENGTH = 256
+  FLASH      (rx)  : ORIGIN = 0x0800C100, LENGTH = 975K
 }
 
 /* Sections */
 SECTIONS
 {
-
+/*
   .bootloader_section :
   {
     . = ALIGN(4);
-    KEEP(*(.bootloader_section)) /* bootloader code */
+    KEEP(*(.bootloader_section)) 
     . = ALIGN(4);
-  } >BL_FLASH
-	
+  } >BL_FLASH  
+  
+  
+  .HEADER_DATA :
+  {
+    . = ALIGN(4);
+    KEEP(*(.HEADER_DATA)) 
+    . = ALIGN(4);
+    . = ORIGIN(IMAGE_HEADER) + 0x100;
+  } >IMAGE_HEADER
+*/	
 
   /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
     . = ALIGN(4);
+     __isr_vector_start__ = .;
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >FLASH
@@ -205,6 +216,17 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM
+  
+  .flash_fill :
+	{
+	    . = ALIGN(4);
+	
+	    FILL(0xFFFFFFFF);
+	
+	    . = ORIGIN(FLASH) + LENGTH(FLASH) - 1;
+	
+	    BYTE(0xFF);
+	} > FLASH
 
   /* Remove information from the compiler libraries */
   /DISCARD/ :
